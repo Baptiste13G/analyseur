@@ -1,0 +1,148 @@
+import csv
+import random
+seuil_tri= 30
+
+#CSV
+
+def lire_csv(nom_fichier: str) -> list:
+    """Lit un fichier CSV contenant une valeur par ligne"""
+    valeurs = []
+    with open(nom_fichier, newline='') as fichier:
+        lecteur = csv.reader(fichier)
+        for ligne in lecteur:
+            valeurs.append(float(ligne[0]))
+    return valeurs
+
+#
+
+def analyse(tab: list) -> dict:
+    """Renvoie une analyse complète de la liste"""
+    return {
+        "minimum": minimum(tab),
+        "maximum": maximum(tab),
+        "moyenne": moyenne(tab),
+        "liste_triee": tri(tab),
+    }
+
+#Statistiques
+
+def moyenne(tab: list) -> float:
+    """Cette fonction permet de renvoyer la moyenne de la base de donnée"""
+    if len(tab)==0:
+        return None
+    return sum(tab) / len(tab)
+        
+
+def minimum(tab: list) -> int:
+    """Cette fonction permet de retrouver le minimum de la base de donnée sans utiliser la fonction min"""
+    if len(tab)==0:
+        return None
+    min_val=tab[0]
+    for i in tab:
+        if i < min_val:
+            min_val=i
+    return min_val
+
+
+def maximum(tab: list) -> int:
+    """Cette fonction permet de retrouver le maximum de la base de donnée sans utiliser la fonction max"""
+    if len(tab)==0:
+        return None
+    max_val=tab[0]
+    for i in tab:
+        if i>max_val:
+            max_val=i
+    return max_val
+
+#Recherches 
+
+def recherche(tab: list,valeur: int):
+    if len(tab)<30:
+        return recherche_valeur(tab,valeur)
+    else:
+        tab_triee=tri(tab)
+        return recherche_dicho(tab_triee,valeur)
+
+def recherche_dicho(tab: list[int],valeur: int):
+    """Recherche une valeur dans une liste triée par recherche dichotomique."""
+    debut, fin = 0, len(tab) - 1
+    while debut <= fin:
+        milieu = (debut + fin) // 2
+        if tab[milieu] == valeur:
+            return milieu
+        elif valeur > tab[milieu]:
+            debut = milieu + 1
+        else:
+            fin = milieu - 1
+    return -1
+
+def recherche_valeur(tab : list,valeur: int):
+    """Cette fonction effectur une recherche linéaire"""
+    for i, v in enumerate(tab):
+        if v == valeur:
+            return i
+    return -1
+
+#Tri
+
+def tri(tab: list)->list:
+    """Cette fonction permet de trier une liste donnée.
+    La liste peut être triée de deux façon différentes : Tri par insertion 
+                                                         Tri par fusion
+    Le choix du tri varie selon la longueur de la liste car le tri par insertion
+    peut vite devenir lent lorsqu'il s'agit de liste grande.
+    Donc si la liste ne dépasse pas 30 éléments le tri par insertion sera utlisé sinon le tri fusion"""
+    if len(tab)<seuil_tri:
+        liste_trie=tri_insertion(tab)
+        print("Méthode de tri utilisée : Tri par insertion")
+        return liste_trie
+    else:
+        liste_trie=tri_fusion(tab)
+        print("Méthode de tri utilisée : Tri fusion")
+        return liste_trie
+
+def tri_insertion(tab: list)->list:
+    resultat = tab.copy()
+    for i in range(1, len(resultat)):
+        insere = resultat[i]
+        j = i - 1
+        while j >= 0 and resultat[j] > insere:
+            resultat[j + 1] = resultat[j]
+            j -= 1
+        resultat[j + 1] = insere
+    return resultat
+
+def tri_fusion(tab: list)->list:
+    if len(tab) <= 1:
+        return tab  # liste déjà triée
+    milieu = len(tab)//2
+    tab_gauche=tab[:milieu] #sous-tab gauche
+    tab_droite=tab[milieu:] #sous-tab droite
+
+    tab_gauche=tri_fusion(tab_gauche)
+    tab_droite=tri_fusion(tab_droite)
+
+    return fusion(tab_gauche, tab_droite)
+
+def fusion(tab1: list, tab2: list)->list:
+    tab_fusion=[]
+    i=0
+    j=0
+    while i<len(tab1) and j<len(tab2):
+        if tab1[i]< tab2[j]:
+            tab_fusion.append(tab1[i])
+            i=i+1
+        else:
+            tab_fusion.append(tab2[j])
+            j=j+1
+
+    tab_fusion.extend(tab1[i:])
+    tab_fusion.extend(tab2[j:])
+
+    return tab_fusion
+
+test3=lire_csv("data.csv")
+print(analyse(test3))
+valeur = int(input("Quelle valeur souhaitez-vous rechercher ? "))
+indice=recherche(test3,valeur)
+print(indice)
