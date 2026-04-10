@@ -26,4 +26,4 @@ README.md
 ```
 
 ## Contexte
-Projet réalisé en autonomie dans le cadre d'une préparation à une entrée en L2 Informatique, visant à consolider les bases algorithmiques.
+Projet réalisé en autonomie couvrant des notions de L1 et L2 Informatique : algorithmique de tri, complexité, recherche dichotomique et manipulation de fichiers.
